@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <link rel="stylesheet" href="./app.css">
+    <script src="./app.js" defer></script>
+    <title>Lepusa Counter</title>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">MOONBIT DESKTOP DEMO</p>
+          <h1>Lepusa Counter</h1>
+          <p class="intro">
+            一个很小的桌面应用，演示打包资源、能力控制和原生 IPC。
+          </p>
+        </div>
+        <div id="runtime-status" class="status" aria-live="polite">
+          <span class="status-dot"></span>
+          <span>正在连接…</span>
+        </div>
+      </header>
+
+      <section class="counter-card" aria-labelledby="counter-title">
+        <p id="counter-title" class="label">CURRENT COUNT</p>
+        <output id="count" class="count" aria-live="polite">0</output>
+        <div class="actions">
+          <button class="secondary" type="button" data-action="decrement" aria-label="减一">−</button>
+          <button class="reset" type="button" data-action="reset">重置</button>
+          <button class="primary" type="button" data-action="increment" aria-label="加一">+</button>
+        </div>
+      </section>
+
+      <section class="details" aria-label="Demo capabilities">
+        <article>
+          <span>01</span>
+          <h2>Packaged assets</h2>
+          <p>HTML、CSS 和 JavaScript 通过 <code>lepusa://</code> 协议加载。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Scoped bridge</h2>
+          <p>页面只能调用 manifest 明确授权的原生命令。</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>Native state</h2>
+          <p>计数通过官方 <code>store</code> 插件保存到运行时状态。</p>
+        </article>
+      </section>
+
+      <footer>
+        <span id="activity">等待第一次操作</span>
+        <span>Powered by Lepusa</span>
+      </footer>
+    </main>
+  </body>
+</html>

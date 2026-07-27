@@ -1,0 +1,36 @@
+{
+  "identifier": "dev.vectie.lepusa.examples.counter",
+  "productName": "Lepusa Counter Demo",
+  "version": "0.1.0",
+  "runtime": {
+    "backend": "system-webview",
+    "assetProtocol": "lepusa",
+    "devtools": false
+  },
+  "window": {
+    "label": "main",
+    "title": "Lepusa Counter",
+    "width": 920,
+    "height": 680,
+    "resizable": true,
+    "source": { "packaged": "dist" }
+  },
+  "plugins": [
+    { "name": "log" },
+    { "name": "store" }
+  ],
+  "capabilities": [
+    {
+      "name": "main",
+      "windows": ["main"],
+      "commands": [
+        "log.write",
+        "store.get",
+        "store.set",
+        "store.delete",
+        "store.clear",
+        "store.keys"
+      ]
+    }
+  ]
+}

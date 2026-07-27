@@ -1,0 +1,87 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "local/lepusa_moondesk"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn update(Message, Model) -> Model
+
+// Errors
+
+// Types and methods
+pub(all) enum Lane {
+  Backlog
+  InProgress
+  Done
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn Lane::label(Self) -> String
+
+pub(all) enum Message {
+  AddTask(String, Priority)
+  Advance(Int)
+  MoveBack(Int)
+  Delete(Int)
+  Select(Int)
+  SetFilter(PriorityFilter)
+  ClearCompleted
+  ToggleCompact
+  Undo
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+pub struct Model {
+  tasks : Array[Task]
+  next_id : Int
+  filter : PriorityFilter
+  selected_id : Int?
+  compact : Bool
+  history : Array[(Array[Task], Int)]
+  activity : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn Model::activity(Self) -> Array[String]
+pub fn Model::can_undo(Self) -> Bool
+pub fn Model::compact(Self) -> Bool
+pub fn Model::count(Self, Lane) -> Int
+pub fn Model::done_points(Self) -> Int
+pub fn Model::filter(Self) -> PriorityFilter
+pub fn Model::initial() -> Self
+pub fn Model::progress_percent(Self) -> Int
+pub fn Model::selected_id(Self) -> Int?
+pub fn Model::selected_task(Self) -> Task?
+pub fn Model::tasks_in(Self, Lane) -> Array[Task]
+pub fn Model::total(Self) -> Int
+pub fn Model::total_points(Self) -> Int
+
+pub(all) enum Priority {
+  Low
+  Medium
+  High
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn Priority::class_name(Self) -> String
+pub fn Priority::label(Self) -> String
+
+pub(all) enum PriorityFilter {
+  AllPriorities
+  OnlyPriority(Priority)
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn PriorityFilter::label(Self) -> String
+
+pub(all) struct Task {
+  id : Int
+  title : String
+  lane : Lane
+  priority : Priority
+  points : Int
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn Task::id(Self) -> Int
+pub fn Task::lane(Self) -> Lane
+pub fn Task::points(Self) -> Int
+pub fn Task::priority(Self) -> Priority
+pub fn Task::title(Self) -> String
+
+// Type aliases
+
+// Traits
+

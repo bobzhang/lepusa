@@ -1169,6 +1169,32 @@ async test "checked examples cover rabbita static and gateway modes" {
 }
 
 ///|
+async test "counter demo has packaged assets and capability scoped handlers" {
+  let project = "examples/counter/lepusa.json"
+  let verify = render_cli_async(["verify", "macos", "--project", project])
+  assert_eq(verify.exit_code, 0)
+  assert_true(
+    verify.output.contains("[ok] content: windows=1 checked=1 skipped=0"),
+  )
+  assert_true(verify.output.contains("[ok] handlers: registered=6 missing=0"))
+  let script = render_cli_async([
+    "asset", "lepusa://packaged/main/app.js", "--project", project,
+  ])
+  assert_eq(script.exit_code, 0)
+  assert_true(script.output.contains("\"kind\":\"packaged-file\""))
+  assert_true(
+    script.output.contains("\"path\":\"examples/counter/dist/app.js\""),
+  )
+  let store = render_cli_async([
+    "invoke", "main", "store.set", "{\"key\":\"counter.value\",\"value\":\"7\"}",
+    "--project", project,
+  ])
+  assert_eq(store.exit_code, 0)
+  assert_true(store.output.contains("\\\"key\\\":\\\"counter.value\\\""))
+  assert_true(store.output.contains("\\\"value\\\":\\\"7\\\""))
+}
+
+///|
 async test "foundation examples write bundles with runtime contracts" {
   let stamp = @async.now().to_int()
   let rabbita_out = "/tmp/lepusa-example-rabbita-bundle-\{stamp}"

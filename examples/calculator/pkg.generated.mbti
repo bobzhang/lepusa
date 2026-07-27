@@ -1,0 +1,47 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "local/lepusa_calculator"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn update(Message, Model) -> Model
+
+// Errors
+
+// Types and methods
+pub(all) enum Message {
+  Digit(Int)
+  DecimalPoint
+  ChooseOperator(Operator)
+  Equals
+  Clear
+  ToggleSign
+  Percent
+} derive(Eq, @debug.Debug)
+
+pub struct Model {
+  display : String
+  accumulator : Double?
+  pending : Operator?
+  replace_input : Bool
+  status : String
+} derive(Eq, @debug.Debug)
+pub fn Model::display(Self) -> String
+pub fn Model::initial() -> Self
+pub fn Model::operation_label(Self) -> String
+pub fn Model::status(Self) -> String
+
+pub(all) enum Operator {
+  Add
+  Subtract
+  Multiply
+  Divide
+} derive(Eq, @debug.Debug)
+pub fn Operator::symbol(Self) -> String
+
+// Type aliases
+
+// Traits
+

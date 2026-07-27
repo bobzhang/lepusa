@@ -1,0 +1,12 @@
+import {
+  "local/lepusa_moondesk" @moondesk,
+  "moonbitlang/core/json",
+  "vectie/lepusa",
+  "vectie/lepusa/desktop",
+  "vectie/lepusa/runtime/macos",
+  "vectie/lepusa/ui",
+}
+
+supported_targets = "native"
+
+pkgtype(kind: "executable")
