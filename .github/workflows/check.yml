@@ -23,4 +23,7 @@ jobs:
       - run: moon update
       - run: moon check --deny-warn --target native
       - run: moon fmt --check
-      - run: moon test --target native
+      # Existing integration tests require Cocoa/WebKit on the host.
+      # Linux retains strict compile coverage; macOS runs the complete suite.
+      - if: runner.os == 'macOS'
+        run: moon test --target native
