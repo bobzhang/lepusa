@@ -6,9 +6,9 @@
 //
 // Or manually declare it in `import`, for example:
 import {
-  "moonbitlang/async@0.19.4",
-  "moonbitlang/x@0.4.45",
-  "vectie/moonlib@0.1.8",
+  "moonbitlang/async@0.22.9",
+  "moonbitlang/x@0.5.7",
+  "vectie/moonlib@0.1.23",
 }
 
 name = "vectie/lepusa"

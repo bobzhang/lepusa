@@ -14,7 +14,7 @@ test "distribution manifest parser exposes installer-facing bundle data" {
       match @lepusa.BundleConfig::new(metadata, target=Linux).plan(runtime) {
         Ok(plan) =>
           match
-            BundleDistributionManifest::parse(
+            @bundle.BundleDistributionManifest::parse(
               "app/lepusa/distribution.json",
               plan.distribution_manifest_json(),
             ) {
@@ -171,7 +171,7 @@ test "distribution manifest parser exposes installer-facing bundle data" {
 ///|
 test "release plan reports missing required release data" {
   match
-    BundleDistributionManifest::parse(
+    @bundle.BundleDistributionManifest::parse(
       "app/lepusa/distribution.json",
       (
         #|{
@@ -216,7 +216,7 @@ test "release plan reports missing required release data" {
 ///|
 test "package plan reports missing target package artifacts" {
   match
-    BundleDistributionManifest::parse(
+    @bundle.BundleDistributionManifest::parse(
       "app/lepusa/distribution.json",
       (
         #|{
@@ -259,7 +259,7 @@ test "package plan reports missing target package artifacts" {
 ///|
 test "macOS package plan includes drag-to-Applications shortcut" {
   match
-    BundleDistributionManifest::parse(
+    @bundle.BundleDistributionManifest::parse(
       "/tmp/lepusa-macos-bundle/demo.app/Contents/Resources/lepusa/distribution.json",
       (
         #|{
@@ -315,7 +315,7 @@ test "macOS package plan includes drag-to-Applications shortcut" {
 ///|
 test "macOS package plan signs the exact staged app before creating the disk image" {
   match
-    BundleDistributionManifest::parse(
+    @bundle.BundleDistributionManifest::parse(
       "/tmp/lepusa-macos-bundle/demo.app/Contents/Resources/lepusa/distribution.json",
       (
         #|{
@@ -365,7 +365,7 @@ test "macOS package plan signs the exact staged app before creating the disk ima
 ///|
 test "package plan emits windows package scripts" {
   match
-    BundleDistributionManifest::parse(
+    @bundle.BundleDistributionManifest::parse(
       "/tmp/lepusa-windows-bundle/package-data/lepusa/distribution.json",
       (
         #|{
@@ -430,7 +430,7 @@ test "package plan emits windows package scripts" {
 
 ///|
 test "distribution manifest parser validates required fields" {
-  match BundleDistributionManifest::parse("distribution.json", "{}") {
+  match @bundle.BundleDistributionManifest::parse("distribution.json", "{}") {
     Ok(_) => abort("unexpected valid distribution manifest")
     Err(problem) => {
       assert_true(

@@ -2,7 +2,7 @@ import {
   "moonbitlang/async/fs",
   "moonbitlang/core/json",
   "moonbitlang/x/fs" @xfs,
-  "moonbitlang/x/sys",
+  "moonbitlang/core/env",
   "vectie/lepusa",
   "vectie/lepusa/runtime",
   "vectie/lepusa/runtime/bundled",

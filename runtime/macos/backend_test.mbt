@@ -96,10 +96,10 @@ fn async_bridge_test_host() -> @runtime.RuntimeHost {
 
 ///|
 test "macos backend exposes wkwebview descriptor" {
-  let descriptor = backend()
+  let descriptor = @macos.backend()
   assert_eq(descriptor.name(), "macos")
   assert_eq(descriptor.webview_engine(), "WKWebView")
-  let capability = launch_capability()
+  let capability = @macos.launch_capability()
   assert_true(capability.webview_creation())
   assert_true(capability.sync_bridge_evaluate())
   assert_true(capability.async_bridge_drain())
@@ -109,7 +109,7 @@ test "macos backend exposes wkwebview descriptor" {
     .async_bridge_drain_message()
     .contains("packetized event-loop requests"),
   )
-  let execution = operation_executor().execute_all([
+  let execution = @macos.operation_executor().execute_all([
     @runtime.NativeExecutableOperation::evaluate_script(
       @runtime.NativeEvaluationScript::new(
         window_label="main",
@@ -249,7 +249,7 @@ test "macos backend exposes wkwebview descriptor" {
 
 ///|
 test "macos backend links Cocoa and WebKit" {
-  match detect() {
+  match @macos.detect() {
     Ok(descriptor) => {
       assert_eq(descriptor.name(), "macos")
       assert_eq(descriptor.webview_engine(), "WKWebView")
@@ -260,7 +260,7 @@ test "macos backend links Cocoa and WebKit" {
 
 ///|
 test "macos backend lowers runtime host to launch plan" {
-  match backend().plan(test_host()) {
+  match @macos.backend().plan(test_host()) {
     Ok(plan) => {
       assert_eq(plan.backend_name(), "macos")
       assert_eq(plan.webview_engine(), "WKWebView")
@@ -287,7 +287,7 @@ test "macos backend lowers runtime host to launch plan" {
 
 ///|
 test "macos backend prepares startup operations for native runner" {
-  match backend().runner_plan(test_host()) {
+  match @macos.backend().runner_plan(test_host()) {
     Ok(plan) => {
       assert_eq(plan.backend_name(), "macos")
       assert_eq(plan.webview_engine(), "WKWebView")
@@ -319,7 +319,7 @@ test "macos backend prepares startup operations for native runner" {
       assert_true(json.contains("\"kind\":\"navigate-window\""))
       assert_true(json.contains("\"lifecycleOperations\""))
       assert_true(json.contains("\"name\":\"flush\""))
-      let execution = operation_executor().execute_startup(
+      let execution = @macos.operation_executor().execute_startup(
         plan.execution_plan(),
       )
       assert_eq(execution.operation_count(), 3)
@@ -333,7 +333,7 @@ test "macos backend prepares startup operations for native runner" {
 
 ///|
 test "macos backend exposes native runtime facade" {
-  match runtime(test_host()) {
+  match @macos.runtime(test_host()) {
     Ok(runtime) => {
       assert_eq(runtime.backend().name(), "macos")
       assert_true(
@@ -351,9 +351,9 @@ test "macos backend exposes native runtime facade" {
 
 ///|
 test "macos backend prepares first webview load url" {
-  match runtime(test_host()) {
+  match @macos.runtime(test_host()) {
     Ok(runtime) =>
-      match prepare_run(runtime) {
+      match @macos.prepare_run(runtime) {
         Ok(plan) => {
           let webviews = plan.webviews()
           assert_eq(webviews.length(), 1)
@@ -411,7 +411,9 @@ test "macos backend prepares first webview load url" {
           assert_eq(bridge.sync_command_routes().length(), 0)
           assert_eq(bridge.async_command_routes().length(), 0)
           assert_false(bridge.requires_async_dispatch())
-          let session = plan.launch_session_with_capability(launch_capability())
+          let session = plan.launch_session_with_capability(
+            @macos.launch_capability(),
+          )
           assert_eq(session.webviews().length(), 1)
           assert_eq(session.execution().startup_operations().length(), 3)
           assert_eq(session.service_supervisor().backend_name(), "macos")
@@ -425,9 +427,9 @@ test "macos backend prepares first webview load url" {
 
 ///|
 test "macos backend marks async bridge routes" {
-  match runtime(async_bridge_test_host()) {
+  match @macos.runtime(async_bridge_test_host()) {
     Ok(runtime) =>
-      match prepare_run(runtime) {
+      match @macos.prepare_run(runtime) {
         Ok(plan) => {
           let bridge = plan.bridge()
           assert_eq(bridge.sync_command_routes().length(), 0)
@@ -435,11 +437,16 @@ test "macos backend marks async bridge routes" {
           assert_eq(async_routes.length(), 1)
           assert_eq(async_routes[0], "fs.readText")
           assert_true(bridge.requires_async_dispatch())
-          let session = plan.launch_session_with_capability(launch_capability())
+          let session = plan.launch_session_with_capability(
+            @macos.launch_capability(),
+          )
           assert_true(session.can_launch())
           assert_true(session.launch_blocker("macOS") is None)
           assert_true(
-            plan.launch_blocker_with_capability("macOS", launch_capability())
+            plan.launch_blocker_with_capability(
+              "macOS",
+              @macos.launch_capability(),
+            )
             is None,
           )
         }
@@ -451,13 +458,16 @@ test "macos backend marks async bridge routes" {
 
 ///|
 test "macos open-window launch allows async bridge routes" {
-  match runtime(async_bridge_test_host()) {
+  match @macos.runtime(async_bridge_test_host()) {
     Ok(runtime) =>
-      match prepare_run(runtime) {
+      match @macos.prepare_run(runtime) {
         Ok(plan) => {
           assert_true(plan.bridge().requires_async_dispatch())
           assert_true(
-            plan.launch_blocker_with_capability("macOS", launch_capability())
+            plan.launch_blocker_with_capability(
+              "macOS",
+              @macos.launch_capability(),
+            )
             is None,
           )
         }
@@ -469,9 +479,9 @@ test "macos open-window launch allows async bridge routes" {
 
 ///|
 test "macos backend preserves all webviews in run plan" {
-  match runtime(multi_window_test_host()) {
+  match @macos.runtime(multi_window_test_host()) {
     Ok(runtime) =>
-      match prepare_run(runtime) {
+      match @macos.prepare_run(runtime) {
         Ok(plan) => {
           let webviews = plan.webviews()
           assert_eq(webviews.length(), 2)
@@ -501,12 +511,15 @@ test "macos backend preserves all webviews in run plan" {
 
 ///|
 test "macos open-window launch prepares initial extra window operations" {
-  match runtime(multi_window_test_host()) {
+  match @macos.runtime(multi_window_test_host()) {
     Ok(runtime) =>
-      match prepare_run(runtime) {
+      match @macos.prepare_run(runtime) {
         Ok(plan) => {
           assert_true(
-            plan.launch_blocker_with_capability("macOS", launch_capability())
+            plan.launch_blocker_with_capability(
+              "macOS",
+              @macos.launch_capability(),
+            )
             is None,
           )
           let packet = plan.initial_open_packet()
@@ -524,9 +537,9 @@ test "macos open-window launch prepares initial extra window operations" {
 
 ///|
 test "macos backend dry run does not enter native loop" {
-  match runtime(test_host()) {
+  match @macos.runtime(test_host()) {
     Ok(runtime) =>
-      match run(runtime) {
+      match @macos.run(runtime) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           match result.plan().first_webview() {
@@ -554,7 +567,7 @@ test "macos backend prepares bundled runtime manifest" {
       bundled_macos_manifest(),
     ) {
     Ok(manifest) =>
-      match prepare_bundled_run(manifest) {
+      match @macos.prepare_bundled_run(manifest) {
         Ok(plan) => {
           let webviews = plan.webviews()
           assert_eq(webviews.length(), 1)
@@ -613,7 +626,9 @@ test "macos backend prepares bundled runtime manifest" {
           assert_eq(async_routes.length(), 1)
           assert_eq(async_routes[0], "fs.writeText")
           assert_true(bridge.requires_async_dispatch())
-          let session = plan.launch_session_with_capability(launch_capability())
+          let session = plan.launch_session_with_capability(
+            @macos.launch_capability(),
+          )
           assert_eq(session.webviews().length(), 1)
           assert_eq(session.execution().startup_operations().length(), 3)
           assert_true(session.can_launch())
@@ -652,7 +667,7 @@ test "macos service executor reports native service failures" {
       service,
     ]),
   )
-  let startup = service_executor().execute_startup(plan)
+  let startup = @macos.service_executor().execute_startup(plan)
   assert_false(startup.ok())
   assert_eq(startup.action_count(), 2)
   match startup.first_failure_message(context="macOS service startup") {
@@ -671,7 +686,7 @@ test "macos service executor reports native service failures" {
     startup.action_reports()[1].status() is NativeServiceActionFailed(message) &&
     message.contains("macOS service readiness failed"),
   )
-  let shutdown = service_executor().execute_shutdown(plan)
+  let shutdown = @macos.service_executor().execute_shutdown(plan)
   assert_true(shutdown.ok())
   assert_true(
     shutdown.action_reports()[0].status() is NativeServiceActionSkipped(message) &&
@@ -687,12 +702,12 @@ test "macos bundled open-window launch allows async bridge routes" {
       bundled_macos_manifest(),
     ) {
     Ok(manifest) =>
-      match prepare_bundled_run(manifest) {
+      match @macos.prepare_bundled_run(manifest) {
         Ok(plan) => {
           assert_true(plan.bridge().requires_async_dispatch())
           assert_true(
             plan
-            .launch_session_with_capability(launch_capability())
+            .launch_session_with_capability(@macos.launch_capability())
             .can_launch(),
           )
         }
@@ -704,7 +719,7 @@ test "macos bundled open-window launch allows async bridge routes" {
 
 ///|
 async test "macos bridge dispatch returns response callback script" {
-  match runtime(bridge_test_host()) {
+  match @macos.runtime(bridge_test_host()) {
     Ok(runtime) => {
       let message = "{\"id\":\"42\",\"window_label\":\"main\",\"plugin\":\"core\",\"command\":\"invoke\",\"payload\":\"true\"}"
       match runtime.dispatch_bridge_message(message) {
@@ -734,7 +749,7 @@ async test "macos bridge dispatch returns response callback script" {
 
 ///|
 async test "macos bridge prepares async messages before dispatch" {
-  match runtime(async_bridge_test_host()) {
+  match @macos.runtime(async_bridge_test_host()) {
     Ok(runtime) => {
       let message = "{\"id\":\"44\",\"window_label\":\"main\",\"plugin\":\"fs\",\"command\":\"readText\",\"payload\":\"true\"}"
       match runtime.prepare_bridge_message(message) {
@@ -826,7 +841,7 @@ fn bundled_macos_manifest() -> String {
 
 ///|
 async test "macos bridge dispatch reports missing window" {
-  match runtime(bridge_test_host()) {
+  match @macos.runtime(bridge_test_host()) {
     Ok(runtime) => {
       let message = "{\"id\":\"43\",\"window_label\":\"other\",\"plugin\":\"core\",\"command\":\"invoke\"}"
       match runtime.dispatch_bridge_message(message) {
@@ -841,5 +856,5 @@ async test "macos bridge dispatch reports missing window" {
 
 ///|
 test "macOS bridge replies target the originating visible frame" {
-  assert_true(frame_targeted_bridge_replies())
+  assert_true(@macos.frame_targeted_bridge_replies())
 }
