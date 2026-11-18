@@ -1937,7 +1937,7 @@ test "runtime session applies lifecycle hooks without host state" {
                 step.operations()[1]
                 is RuntimeNavigateWindow(
                   "main",
-                  "lepusa://inline/main/index.html"
+                  "lepusa://inline/main/index.html",
                 ),
               )
               match

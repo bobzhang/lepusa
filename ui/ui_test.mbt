@@ -54,10 +54,11 @@ test "ui html can back a lepusa cell" {
 }
 
 ///|
+#derive(Debug, Eq)
 enum TestCounterMessage {
   TestIncrement
   TestDecrement
-} derive(Debug, Eq)
+}
 
 ///|
 fn encode_counter_message(message : TestCounterMessage) -> String {
@@ -81,8 +82,8 @@ fn decode_counter_message(
 ///|
 fn update_counter(
   message : TestCounterMessage,
-  count : Int,
-) -> (Int, @lepusa.Cmd) {
+  count : Int32,
+) -> (Int32, @lepusa.Cmd) {
   match message {
     TestIncrement => (count + 1, @lepusa.Cmd::effect("counter.changed"))
     TestDecrement => (count - 1, @lepusa.none)
@@ -92,7 +93,7 @@ fn update_counter(
 ///|
 fn view_counter(
   emit : ViewEmit[TestCounterMessage],
-  count : Int,
+  count : Int32,
 ) -> @lepusa.Html {
   main_([
     h1([text("Counter")]),
@@ -103,7 +104,7 @@ fn view_counter(
 }
 
 ///|
-fn counter_program(count : Int) -> UiProgram[Int, TestCounterMessage] {
+fn counter_program(count : Int32) -> UiProgram[Int32, TestCounterMessage] {
   UiProgram::new(
     model=count,
     update=update_counter,
