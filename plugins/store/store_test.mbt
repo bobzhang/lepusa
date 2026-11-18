@@ -86,7 +86,7 @@ test "store registry reports missing values and invalid payloads" {
 }
 
 ///|
-fn request(command~ : String, payload? : String = "") -> @lepusa.InvokeRequest {
+fn request(command~ : String, payload~ : String = "") -> @lepusa.InvokeRequest {
   @lepusa.InvokeRequest::new(
     id="1",
     window_label="main",

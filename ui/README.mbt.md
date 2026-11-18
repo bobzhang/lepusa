@@ -32,9 +32,10 @@ test "compose a Lepusa UI view" {
 
 ```mbt check
 ///|
+#derive(Debug, Eq)
 enum CounterMessage {
   Increment
-} derive(Debug, Eq)
+}
 
 ///|
 test "compose a model update view program" {

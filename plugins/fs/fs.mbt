@@ -1,10 +1,11 @@
 ///|
+#derive(Debug, Eq)
 pub struct FsPolicy {
   scopes : Array[@lepusa.FileSystemScope]
-} derive(Debug, Eq)
+}
 
 ///|
-pub fn FsPolicy::new(scopes? : Array[@lepusa.FileSystemScope] = []) -> FsPolicy {
+pub fn FsPolicy::new(scopes~ : Array[@lepusa.FileSystemScope] = []) -> FsPolicy {
   { scopes, }
 }
 
@@ -46,7 +47,7 @@ pub fn FsPolicy::resolve(
   self : FsPolicy,
   scope_name~ : String,
   path~ : String,
-  write? : Bool = false,
+  write~ : Bool = false,
 ) -> Result[String, String] {
   match self.find_scope(scope_name) {
     None => Err("unknown filesystem scope: \{scope_name}")
@@ -94,19 +95,19 @@ pub fn plugin() -> @lepusa.Plugin {
 }
 
 ///|
-pub fn read_capability(name? : String = "fs-read") -> @lepusa.Capability {
+pub fn read_capability(name~ : String = "fs-read") -> @lepusa.Capability {
   @lepusa.Capability::new(name).permission(FileSystemRead)
 }
 
 ///|
-pub fn write_capability(name? : String = "fs-write") -> @lepusa.Capability {
+pub fn write_capability(name~ : String = "fs-write") -> @lepusa.Capability {
   @lepusa.Capability::new(name).permission(FileSystemWrite)
 }
 
 ///|
 pub fn read_capability_for_window(
   window_label : String,
-  name? : String = "fs-read",
+  name~ : String = "fs-read",
 ) -> @lepusa.Capability {
   read_capability(name~).window(window_label)
 }
@@ -114,14 +115,14 @@ pub fn read_capability_for_window(
 ///|
 pub fn write_capability_for_window(
   window_label : String,
-  name? : String = "fs-write",
+  name~ : String = "fs-write",
 ) -> @lepusa.Capability {
   write_capability(name~).window(window_label)
 }
 
 ///|
 pub fn read_write_capability(
-  name? : String = "fs-read-write",
+  name~ : String = "fs-read-write",
 ) -> @lepusa.Capability {
   @lepusa.Capability::new(name)
   .permission(FileSystemRead)
@@ -131,14 +132,14 @@ pub fn read_write_capability(
 ///|
 pub fn read_write_capability_for_window(
   window_label : String,
-  name? : String = "fs-read-write",
+  name~ : String = "fs-read-write",
 ) -> @lepusa.Capability {
   read_write_capability(name~).window(window_label)
 }
 
 ///|
 pub fn registry(
-  policy? : FsPolicy = FsPolicy::new(),
+  policy~ : FsPolicy = FsPolicy::new(),
 ) -> @lepusa.CommandRegistry {
   register(@lepusa.CommandRegistry::new(), policy~)
 }
@@ -146,7 +147,7 @@ pub fn registry(
 ///|
 pub fn register(
   registry : @lepusa.CommandRegistry,
-  policy? : FsPolicy = FsPolicy::new(),
+  policy~ : FsPolicy = FsPolicy::new(),
 ) -> @lepusa.CommandRegistry {
   registry
   .register_async_fn(
