@@ -6,6 +6,6 @@ import {
   "vectie/lepusa/plugins/catalog",
 }
 
-options(
-  test_import: [ "moonbitlang/async" ],
-)
+import {
+  "moonbitlang/async",
+} for "test"

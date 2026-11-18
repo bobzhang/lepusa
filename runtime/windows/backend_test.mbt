@@ -56,18 +56,18 @@ fn multi_window_test_host() -> @runtime.RuntimeHost {
 
 ///|
 test "windows backend exposes webview2 descriptor" {
-  let descriptor = backend()
+  let descriptor = @windows.backend()
   assert_eq(descriptor.name(), "windows")
   assert_eq(descriptor.webview_engine(), "WebView2")
-  let preflight = preflight()
+  let preflight = @windows.preflight()
   assert_eq(preflight.platform(), "windows")
   assert_eq(preflight.webview_engine(), "WebView2")
   assert_eq(preflight.dependency_name(), "webview2-loader")
-  assert_eq(preflight.dependency_available(), available())
+  assert_eq(preflight.dependency_available(), @windows.available())
   assert_true(preflight.webview_creation_loop())
   assert_true(preflight.sync_bridge_evaluate())
   assert_true(preflight.async_bridge_drain())
-  assert_eq(preflight.can_launch(), available())
+  assert_eq(preflight.can_launch(), @windows.available())
   assert_true(
     preflight.problem_kind() == "dependency" ||
     preflight.problem_kind() == "none",
@@ -89,9 +89,9 @@ test "windows backend exposes webview2 descriptor" {
   assert_true(preflight.to_json().contains("\"webviewCreationProblem\":"))
   assert_true(preflight.to_json().contains("\"syncBridgeEvaluateProblem\":"))
   assert_true(preflight.to_json().contains("\"asyncBridgeDrainProblem\":"))
-  let capability = launch_capability()
-  assert_eq(capability.webview_creation(), available())
-  assert_eq(capability.sync_bridge_evaluate(), available())
+  let capability = @windows.launch_capability()
+  assert_eq(capability.webview_creation(), @windows.available())
+  assert_eq(capability.sync_bridge_evaluate(), @windows.available())
   assert_true(capability.async_bridge_drain())
   assert_eq(capability.max_webviews(), 0)
   assert_true(capability.webview_creation_message().contains("WebView2"))
@@ -100,7 +100,7 @@ test "windows backend exposes webview2 descriptor" {
     .async_bridge_drain_message()
     .contains("packetized event-loop requests"),
   )
-  let execution = operation_executor().execute_all([
+  let execution = @windows.operation_executor().execute_all([
     @runtime.NativeExecutableOperation::evaluate_script(
       @runtime.NativeEvaluationScript::new(
         window_label="main",
@@ -251,15 +251,15 @@ test "windows backend exposes webview2 descriptor" {
 
 ///|
 test "windows backend prepares multi-window launch session" {
-  match runtime(multi_window_test_host()) {
+  match @windows.runtime(multi_window_test_host()) {
     Ok(runtime) =>
-      match run(runtime) {
+      match @windows.run(runtime) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           assert_eq(result.plan().webview_count(), 2)
           let session = result.launch_session()
           assert_eq(session.webviews().length(), 2)
-          if available() {
+          if @windows.available() {
             assert_true(session.can_launch())
           }
           let packet = @runtime.native_initial_webview_open_handoff_packet(
@@ -277,7 +277,7 @@ test "windows backend prepares multi-window launch session" {
 
 ///|
 test "windows backend reports host availability" {
-  match detect() {
+  match @windows.detect() {
     Ok(descriptor) => assert_eq(descriptor.name(), "windows")
     Err(problem) =>
       assert_eq(problem, "Windows WebView2 backend is not available")
@@ -286,7 +286,7 @@ test "windows backend reports host availability" {
 
 ///|
 test "windows backend lowers runtime host to native runner contract" {
-  match backend().runner_plan(test_host()) {
+  match @windows.backend().runner_plan(test_host()) {
     Ok(plan) => {
       assert_eq(plan.backend_name(), "windows")
       assert_eq(plan.webview_engine(), "WebView2")
@@ -302,7 +302,7 @@ test "windows backend lowers runtime host to native runner contract" {
 
 ///|
 test "windows backend exposes native runtime facade" {
-  match runtime(test_host()) {
+  match @windows.runtime(test_host()) {
     Ok(runtime) => {
       assert_eq(runtime.backend().name(), "windows")
       assert_true(
@@ -315,9 +315,9 @@ test "windows backend exposes native runtime facade" {
 
 ///|
 test "windows backend prepares run plan and gates native launch" {
-  match runtime(test_host()) {
+  match @windows.runtime(test_host()) {
     Ok(runtime) => {
-      match run(runtime) {
+      match @windows.run(runtime) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           assert_eq(result.plan().webview_count(), 1)
@@ -375,14 +375,17 @@ test "windows backend prepares run plan and gates native launch" {
           )
           assert_true(result.plan().service_supervisor_report().ok())
           assert_eq(result.plan().service_supervisor_report().action_count(), 0)
-          assert_eq(execute_service_startup(result.plan()).action_count(), 0)
+          assert_eq(
+            @windows.execute_service_startup(result.plan()).action_count(),
+            0,
+          )
         }
         Err(_) => abort("unexpected invalid Windows dry run")
       }
-      if available() {
-        assert_true(launch_capability().webview_creation())
+      if @windows.available() {
+        assert_true(@windows.launch_capability().webview_creation())
       } else {
-        match launch(runtime) {
+        match @windows.launch(runtime) {
           Ok(result) =>
             match result.status() {
               RunUnsupported(message) =>
@@ -399,9 +402,9 @@ test "windows backend prepares run plan and gates native launch" {
 
 ///|
 test "windows async launch allows scheduler when target is available" {
-  match runtime(async_test_host()) {
+  match @windows.runtime(async_test_host()) {
     Ok(runtime) =>
-      match run(runtime) {
+      match @windows.run(runtime) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           let session = result.launch_session(
@@ -409,16 +412,16 @@ test "windows async launch allows scheduler when target is available" {
           )
           assert_true(session.can_launch())
           assert_eq(
-            session.can_launch_with_capability(launch_capability()),
-            available(),
+            session.can_launch_with_capability(@windows.launch_capability()),
+            @windows.available(),
           )
           match
             session.launch_blocker_with_capability(
               "Windows",
-              launch_capability(),
+              @windows.launch_capability(),
             ) {
             Some(message) => assert_true(message.contains("WebView2"))
-            None => assert_true(available())
+            None => assert_true(@windows.available())
           }
         }
         Err(_) => abort("unexpected invalid Windows async run plan")
@@ -431,23 +434,23 @@ test "windows async launch allows scheduler when target is available" {
       windows_async_bundled_manifest(),
     ) {
     Ok(manifest) =>
-      match run_bundled(manifest) {
+      match @windows.run_bundled(manifest) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           match result.launch_session(bridge_mode=NativeBridgeAsyncCapable) {
             Ok(session) => {
               assert_true(session.can_launch())
               assert_eq(
-                session.can_launch_with_capability(launch_capability()),
-                available(),
+                session.can_launch_with_capability(@windows.launch_capability()),
+                @windows.available(),
               )
               match
                 session.launch_blocker_with_capability(
                   "Windows",
-                  launch_capability(),
+                  @windows.launch_capability(),
                 ) {
                 Some(message) => assert_true(message.contains("WebView2"))
-                None => assert_true(available())
+                None => assert_true(@windows.available())
               }
             }
             Err(problem) => abort(problem)
@@ -467,7 +470,7 @@ test "windows backend prepares bundled runtime contract" {
       windows_bundled_manifest(),
     ) {
     Ok(manifest) => {
-      match prepare_bundled_run(manifest) {
+      match @windows.prepare_bundled_run(manifest) {
         Ok(plan) => {
           assert_eq(plan.webview_count(), 1)
           assert_eq(
@@ -501,7 +504,7 @@ test "windows backend prepares bundled runtime contract" {
           assert_eq(report.backend_name(), "windows")
           assert_true(report.ok())
           assert_eq(report.action_count(), 3)
-          match execute_bundled_app_will_exit(plan) {
+          match @windows.execute_bundled_app_will_exit(plan) {
             Ok(lifecycle) => {
               assert_true(lifecycle.ok())
               assert_eq(lifecycle.operation_count(), 1)
@@ -522,7 +525,7 @@ test "windows backend prepares bundled runtime contract" {
         }
         Err(_) => abort("unexpected invalid Windows bundled run plan")
       }
-      match run_bundled(manifest) {
+      match @windows.run_bundled(manifest) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           assert_eq(result.report().target(), "windows")
@@ -563,7 +566,7 @@ test "windows backend prepares bundled runtime contract" {
         }
         Err(_) => abort("unexpected invalid Windows bundled dry run")
       }
-      match launch_bundled(manifest) {
+      match @windows.launch_bundled(manifest) {
         Ok(result) =>
           match result.status() {
             RunUnsupported(message) => assert_true(message.contains("WebView2"))
@@ -590,7 +593,7 @@ test "windows service executor reports native service failures" {
       service,
     ]),
   )
-  let startup = service_executor().execute_startup(plan)
+  let startup = @windows.service_executor().execute_startup(plan)
   assert_false(startup.ok())
   assert_eq(startup.action_count(), 2)
   match startup.first_failure_message(context="Windows service startup") {
@@ -609,7 +612,7 @@ test "windows service executor reports native service failures" {
     startup.action_reports()[1].status() is NativeServiceActionFailed(message) &&
     message.contains("Windows service readiness failed"),
   )
-  let shutdown = service_executor().execute_shutdown(plan)
+  let shutdown = @windows.service_executor().execute_shutdown(plan)
   assert_true(shutdown.ok())
   assert_true(
     shutdown.action_reports()[0].status() is NativeServiceActionSkipped(message) &&
@@ -628,7 +631,7 @@ test "windows backend rejects mismatched bundled target" {
       ),
     ) {
     Ok(manifest) =>
-      match prepare_bundled_run(manifest) {
+      match @windows.prepare_bundled_run(manifest) {
         Ok(_) => abort("unexpected Windows bundled target match")
         Err(problems) =>
           assert_eq(

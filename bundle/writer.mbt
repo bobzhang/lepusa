@@ -634,7 +634,7 @@ fn bundled_runtime_destination_path(plan : @lepusa.BundlePlan) -> String? {
 ///|
 fn bundled_runtime_source_paths() -> Array[String] {
   let paths : Array[String] = []
-  match @sys.get_env_var("LEPUSA_RUNTIME_EXECUTABLE") {
+  match @env.get_env_var("LEPUSA_RUNTIME_EXECUTABLE") {
     Some(path) if path != "" => paths.push(path)
     _ => ()
   }

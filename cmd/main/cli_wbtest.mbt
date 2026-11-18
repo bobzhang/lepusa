@@ -2390,7 +2390,7 @@ async fn ensure_cli_test_runtime_executable() -> Unit {
     create_mode=CreateOrTruncate,
     permission=0o755,
   )
-  @sys.set_env_var("LEPUSA_RUNTIME_EXECUTABLE", path)
+  @env.set_env_var("LEPUSA_RUNTIME_EXECUTABLE", path)
 }
 
 ///|

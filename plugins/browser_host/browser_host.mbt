@@ -87,7 +87,7 @@ fn handle_capture_screenshot() -> Result[String, String] {
       "protocol": Json::string("lepusa-browser-host-v1"),
       "kind": Json::string("native-visible-webview-png"),
       "byte_length": Json::number(png.length().to_double()),
-      "png_base64": Json::string(@base64.encode(png.view())),
+      "png_base64": Json::string(@base64.encode(png.exact_view())),
     }).stringify(),
   )
 }

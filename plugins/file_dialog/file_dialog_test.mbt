@@ -1,6 +1,6 @@
 ///|
 test "file dialog plugin declares async dialog commands" {
-  let declared = plugin()
+  let declared = @file_dialog.plugin()
   assert_eq(declared.name(), "fileDialog")
   assert_eq(declared.command_routes().length(), 4)
   assert_true(declared.command_routes().contains("fileDialog.openFile"))
@@ -14,7 +14,7 @@ test "file dialog plugin declares async dialog commands" {
 
 ///|
 test "file dialog capabilities grant file dialog permission by window" {
-  let grant = capability_for_window("main")
+  let grant = @file_dialog.capability_for_window("main")
   assert_true(grant.allows(window_label="main", permission=FileDialog))
   assert_false(grant.allows(window_label="settings", permission=FileDialog))
   assert_false(grant.allows(window_label="main", permission=Dialog))
@@ -22,16 +22,19 @@ test "file dialog capabilities grant file dialog permission by window" {
 
 ///|
 test "file dialog policy validates scoped default directories" {
-  let policy = FileDialogPolicy::new()
+  let policy = @file_dialog.FileDialogPolicy::new()
     .default_directory(
-      FileDialogDefaultDirectory::new(
+      @file_dialog.FileDialogDefaultDirectory::new(
         name="documents",
         scope_name="docs",
         path="exports",
       ),
     )
     .default_directory(
-      FileDialogDefaultDirectory::new(name="downloads", scope_name="downloads"),
+      @file_dialog.FileDialogDefaultDirectory::new(
+        name="downloads",
+        scope_name="downloads",
+      ),
     )
   assert_eq(policy.validate().length(), 0)
   let scopes = [
@@ -49,12 +52,15 @@ test "file dialog policy validates scoped default directories" {
 
 ///|
 test "file dialog policy rejects duplicate and unsafe defaults" {
-  let policy = FileDialogPolicy::new()
+  let policy = @file_dialog.FileDialogPolicy::new()
     .default_directory(
-      FileDialogDefaultDirectory::new(name="docs", scope_name="docs"),
+      @file_dialog.FileDialogDefaultDirectory::new(
+        name="docs",
+        scope_name="docs",
+      ),
     )
     .default_directory(
-      FileDialogDefaultDirectory::new(
+      @file_dialog.FileDialogDefaultDirectory::new(
         name="docs",
         scope_name="docs",
         path="../escape",
@@ -71,17 +77,17 @@ test "file dialog policy rejects duplicate and unsafe defaults" {
 
 ///|
 async test "file dialog registry validates scoped picker contracts" {
-  let policy = FileDialogPolicy::new().default_directory(
-    FileDialogDefaultDirectory::new(
+  let policy = @file_dialog.FileDialogPolicy::new().default_directory(
+    @file_dialog.FileDialogDefaultDirectory::new(
       name="documents",
       scope_name="docs",
       path="exports",
     ),
   )
-  let registry = registry(policy~, scopes=[
+  let registry = @file_dialog.registry(policy~, scopes=[
     @lepusa.FileSystemScope::new(name="docs", root="/app/docs", writable=true),
   ])
-  let grant = capability_for_window("main")
+  let grant = @file_dialog.capability_for_window("main")
   assert_true(registry.contains("fileDialog.openFile"))
   assert_true(registry.contains("fileDialog.openFiles"))
   assert_true(registry.contains("fileDialog.openDirectory"))
@@ -136,11 +142,11 @@ async test "file dialog registry validates scoped picker contracts" {
 
 ///|
 test "file dialog native registry exposes picker handlers" {
-  let registry = native_registry()
+  let registry = @file_dialog.native_registry()
   assert_true(registry.contains("fileDialog.openFile"))
   assert_true(registry.contains("fileDialog.openFiles"))
   assert_true(registry.contains("fileDialog.openDirectory"))
   assert_true(registry.contains("fileDialog.saveFile"))
   assert_eq(registry.async_routes().length(), 4)
-  ignore(native_available())
+  ignore(@file_dialog.native_available())
 }

@@ -1,6 +1,5 @@
 import {
   "moonbitlang/core/encoding/utf8",
-  "moonbitlang/core/json",
   "vectie/lepusa",
   "vectie/lepusa/runtime",
   "vectie/lepusa/runtime/bundled",
@@ -10,5 +9,8 @@ supported_targets = "native"
 
 options(
   "native-stub": [ "macos_backend.c" ],
-  test_import: [ "moonbitlang/async" ],
 )
+
+import {
+  "moonbitlang/async",
+} for "test"

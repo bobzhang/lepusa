@@ -359,7 +359,7 @@ fn handle_read_bytes(
             Json::object({
               "scope": Json::string(scope_name),
               "path": Json::string(path),
-              "base64": Json::string(@base64.encode(content.view())),
+              "base64": Json::string(@base64.encode(content.exact_view())),
               "bytes": Json::number(
                 content.length().to_double(),
                 repr=content.length().to_string(),
@@ -409,9 +409,9 @@ fn handle_list(policy : FsPolicy, payload : String) -> Result[String, String] {
     Ok((scope_name, path)) =>
       match policy.resolve(scope_name~, path~) {
         Ok(full_path) => {
-          let entries = @xfs.read_dir(full_path) catch {
+          let entries = (@xfs.read_dir(full_path) catch {
             _ => return Err("could not list filesystem directory")
-          }
+          }).to_owned()
           entries.sort()
           Ok(
             Json::object({
@@ -447,9 +447,7 @@ fn handle_metadata(
             false
           }
           let byte_count = if exists && !is_dir {
-            let bytes = @xfs.read_file_to_bytes(full_path) catch {
-              _ => Bytes::new(0)
-            }
+            let bytes = @xfs.read_file_to_bytes(full_path) catch { _ => b"" }
             bytes.length()
           } else {
             0

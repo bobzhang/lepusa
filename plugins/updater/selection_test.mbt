@@ -27,8 +27,8 @@ fn updater_manifest(
 fn updater_policy(
   channel~ : String = "stable",
   allow_prerelease~ : Bool = false,
-) -> UpdaterPolicy {
-  UpdaterPolicy::new(
+) -> @updater.UpdaterPolicy {
+  @updater.UpdaterPolicy::new(
     feed_url="https://updates.example.com/app.json",
     channel~,
     public_key="ed25519:selection-key",

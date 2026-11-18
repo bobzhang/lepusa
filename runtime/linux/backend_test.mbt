@@ -31,10 +31,10 @@ fn async_test_host() -> @runtime.RuntimeHost {
 
 ///|
 test "linux backend exposes webkitgtk descriptor" {
-  let descriptor = backend()
+  let descriptor = @linux.backend()
   assert_eq(descriptor.name(), "linux")
   assert_eq(descriptor.webview_engine(), "WebKitGTK")
-  let capability = launch_capability()
+  let capability = @linux.launch_capability()
   assert_true(capability.webview_creation())
   assert_true(capability.sync_bridge_evaluate())
   assert_true(capability.async_bridge_drain())
@@ -44,7 +44,7 @@ test "linux backend exposes webkitgtk descriptor" {
     .async_bridge_drain_message()
     .contains("packetized event-loop requests"),
   )
-  let execution = operation_executor().execute_all([
+  let execution = @linux.operation_executor().execute_all([
     @runtime.NativeExecutableOperation::evaluate_script(
       @runtime.NativeEvaluationScript::new(
         window_label="main",
@@ -194,7 +194,7 @@ test "linux backend exposes webkitgtk descriptor" {
 
 ///|
 test "linux backend reports host availability" {
-  match detect() {
+  match @linux.detect() {
     Ok(descriptor) => assert_eq(descriptor.name(), "linux")
     Err(problem) =>
       assert_eq(problem, "Linux WebKitGTK backend is not available")
@@ -203,7 +203,7 @@ test "linux backend reports host availability" {
 
 ///|
 test "linux backend lowers runtime host to native runner contract" {
-  match backend().runner_plan(test_host()) {
+  match @linux.backend().runner_plan(test_host()) {
     Ok(plan) => {
       assert_eq(plan.backend_name(), "linux")
       assert_eq(plan.webview_engine(), "WebKitGTK")
@@ -217,7 +217,7 @@ test "linux backend lowers runtime host to native runner contract" {
 
 ///|
 test "linux backend exposes native runtime facade" {
-  match runtime(test_host()) {
+  match @linux.runtime(test_host()) {
     Ok(runtime) => {
       assert_eq(runtime.backend().name(), "linux")
       assert_true(
@@ -230,9 +230,9 @@ test "linux backend exposes native runtime facade" {
 
 ///|
 test "linux backend prepares run plan and reports unsupported launch" {
-  match runtime(test_host()) {
+  match @linux.runtime(test_host()) {
     Ok(runtime) => {
-      match run(runtime) {
+      match @linux.run(runtime) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           assert_eq(result.plan().webview_count(), 1)
@@ -292,11 +292,14 @@ test "linux backend prepares run plan and reports unsupported launch" {
           )
           assert_true(result.plan().service_supervisor_report().ok())
           assert_eq(result.plan().service_supervisor_report().action_count(), 0)
-          assert_eq(execute_service_startup(result.plan()).action_count(), 0)
+          assert_eq(
+            @linux.execute_service_startup(result.plan()).action_count(),
+            0,
+          )
         }
         Err(_) => abort("unexpected invalid Linux dry run")
       }
-      match launch(runtime) {
+      match @linux.launch(runtime) {
         Ok(result) =>
           match result.status() {
             RunUnsupported(message) =>
@@ -314,9 +317,9 @@ test "linux backend prepares run plan and reports unsupported launch" {
 
 ///|
 test "linux launch allows async bridge scheduler" {
-  match runtime(async_test_host()) {
+  match @linux.runtime(async_test_host()) {
     Ok(runtime) =>
-      match run(runtime) {
+      match @linux.run(runtime) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           assert_true(
@@ -335,7 +338,7 @@ test "linux launch allows async bridge scheduler" {
       linux_async_bundled_manifest(),
     ) {
     Ok(manifest) =>
-      match run_bundled(manifest) {
+      match @linux.run_bundled(manifest) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           match result.launch_session(bridge_mode=NativeBridgeAsyncCapable) {
@@ -357,7 +360,7 @@ test "linux backend prepares bundled runtime contract" {
       linux_bundled_manifest(),
     ) {
     Ok(manifest) => {
-      match prepare_bundled_run(manifest) {
+      match @linux.prepare_bundled_run(manifest) {
         Ok(plan) => {
           assert_eq(plan.webview_count(), 1)
           assert_eq(
@@ -391,7 +394,7 @@ test "linux backend prepares bundled runtime contract" {
           assert_eq(report.backend_name(), "linux")
           assert_true(report.ok())
           assert_eq(report.action_count(), 3)
-          match execute_bundled_app_will_exit(plan) {
+          match @linux.execute_bundled_app_will_exit(plan) {
             Ok(lifecycle) => {
               assert_true(lifecycle.ok())
               assert_eq(lifecycle.operation_count(), 1)
@@ -414,7 +417,7 @@ test "linux backend prepares bundled runtime contract" {
         }
         Err(_) => abort("unexpected invalid Linux bundled run plan")
       }
-      match run_bundled(manifest) {
+      match @linux.run_bundled(manifest) {
         Ok(result) => {
           assert_true(result.status() is RunPrepared)
           assert_eq(result.report().target(), "linux")
@@ -455,7 +458,7 @@ test "linux backend prepares bundled runtime contract" {
         }
         Err(_) => abort("unexpected invalid Linux bundled dry run")
       }
-      match launch_bundled(manifest) {
+      match @linux.launch_bundled(manifest) {
         Ok(result) =>
           match result.status() {
             RunFailed(message) => {
@@ -485,7 +488,7 @@ test "linux service executor reports native service failures" {
       service,
     ]),
   )
-  let startup = service_executor().execute_startup(plan)
+  let startup = @linux.service_executor().execute_startup(plan)
   assert_false(startup.ok())
   assert_eq(startup.action_count(), 2)
   match startup.first_failure_message(context="Linux service startup") {
@@ -504,7 +507,7 @@ test "linux service executor reports native service failures" {
     startup.action_reports()[1].status() is NativeServiceActionFailed(message) &&
     message.contains("Linux service readiness failed"),
   )
-  let shutdown = service_executor().execute_shutdown(plan)
+  let shutdown = @linux.service_executor().execute_shutdown(plan)
   assert_true(shutdown.ok())
   assert_true(
     shutdown.action_reports()[0].status() is NativeServiceActionSkipped(message) &&
@@ -523,7 +526,7 @@ test "linux backend rejects mismatched bundled target" {
       ),
     ) {
     Ok(manifest) =>
-      match prepare_bundled_run(manifest) {
+      match @linux.prepare_bundled_run(manifest) {
         Ok(_) => abort("unexpected Linux bundled target match")
         Err(problems) =>
           assert_eq(
