@@ -6,6 +6,7 @@ import {
   "vectie/lepusa/plugins/catalog",
 }
 
+#cfg(target="native")
 import {
   "moonbitlang/async",
   "moonbitlang/async/fs",
