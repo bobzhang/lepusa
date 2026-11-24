@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/async",
   "moonbitlang/core/env",
   "moonbitlang/async/fs",
   "moonbitlang/core/encoding/utf8",
@@ -25,7 +26,3 @@ options(
   "bin-target": "native",
   targets: { "main.mbt": [ "native" ] },
 )
-
-import {
-  "moonbitlang/async",
-} for "wbtest"
