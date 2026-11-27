@@ -3,7 +3,7 @@ async fn main_async() -> Unit {
   let result = render_runtime_cli_async(drop_program(@env.args()))
   println(result.output)
   if result.exit_code != 0 {
-    @sys.exit(result.exit_code)
+    @env.exit(result.exit_code)
   }
 }
 
